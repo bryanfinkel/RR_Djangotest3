@@ -1,86 +1,99 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <title>Schools Map</title>
     <style>
-      .bryan {
-        color: red;
-        height: 300px;
-        width: 300px;
-      }
-      .style_1 {
-        color: blue;
-      }
-      .style_2 {
-        color: chartreuse;
-      }
-      table,
-      tr,
-      th,
-      td {
-        border: 1px solid black;
+       html, body {
+        height: 100%;
+        margin: 0;
       }
       #map {
-        height: 180px;
+        height: 95vh; /* 95% viewport height */
+        width: 95vw; /* 95% viewport width */
       }
     </style>
   </head>
   <body>
-    <h1 class="style_2" style="text-decoration: underline">Hello Working</h1>
-    <table>
-      <tr>
-        <th>name</th>
-        <th>lat</th>
-        <th>lon</th>
-      </tr>
-      {% for point in allpoints %}
-      <tr>
-        <td>{{point.name}}</td>
-        <td class="style_1">lat:{{ point.lat}}</td>
-        <td class="style_2">lon:{{ point.lon}}</td>
-      </tr>
-
-      {% endfor %}
-    </table>
     <div id="map"></div>
-    <div class="bryan">
-      {% for point in allpoints %}
-      <p>
-        {{point.name}}
-        <span class="style_1"> lat:{{ point.lat}} </span>
-        <span class="style_2"> lon:{{ point.lon}} </span>
-      </p>
-      {% endfor %}
-    </div>
-    <div class="table">
-      <form action="/" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Submit">
-    </form>
-
-    </div>
     <script>
-      var map = L.map("map").setView([51.505, -0.09], 13);
+      var map = L.map("map").setView([-1.286389, 36.817223], 12); // Nairobi coordinates
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution:
-          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
+
+      // Define custom icons with appropriate sizes
+      var redIcon = L.icon({
+        iconUrl: '{% static "images/marker-icon-red.png" %}',
+        shadowUrl: '{% static "images/marker-shadow.png" %}',
+        iconSize: [25, 41], // size of the icon
+        shadowSize: [41, 41], // size of the shadow
+        iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+        shadowAnchor: [12, 41], // the same for the shadow
+        popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+      });
+
+      var blueIcon = L.icon({
+        iconUrl: '{% static "images/marker-icon-blue.png" %}',
+        shadowUrl: '{% static "images/marker-shadow.png" %}',
+        iconSize: [25, 41], // size of the icon
+        shadowSize: [41, 41], // size of the shadow
+        iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+        shadowAnchor: [12, 41], // the same for the shadow
+        popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
+      });
+
+      var marker, circle;
+
+      map.on('click', function(e) {
+        if (marker) {
+          map.removeLayer(marker);
+          map.removeLayer(circle);
+        }
+
+        marker = L.marker(e.latlng).addTo(map);
+        circle = L.circle(e.latlng, {
+          radius: 1609.34, // 1 mile in meters
+          color: 'blue',
+          fillColor: '#30f',
+          fillOpacity: 0.2
+        }).addTo(map);
+
+        fetchNearbySchools(e.latlng.lat, e.latlng.lng);
+      });
+
+      function fetchNearbySchools(lat, lon) {
+        fetch(`/get_nearby_schools/${lat}/${lon}/`)
+          .then(response => response.json())
+          .then(data => {
+            // Remove existing school markers
+            map.eachLayer(function(layer) {
+              if (layer instanceof L.Marker && layer !== marker) {
+                map.removeLayer(layer);
+              }
+            });
+
+            data.forEach(point => {
+              var icon = point.stage_number == 1 ? redIcon : blueIcon;
+
+              L.marker([point.lat, point.lon], { icon: icon })
+                .addTo(map)
+                .bindPopup("<b>" + point.name + "</b><br>Latitude: " + point.lat + "<br>Longitude: " + point.lon);
+            });
+
+            var group = new L.featureGroup([marker, circle]);
+            data.forEach(point => {
+              var schoolMarker = L.marker([point.lat, point.lon]);
+              group.addLayer(schoolMarker);
+            });
+            map.fitBounds(group.getBounds());
+          });
+      }
     </script>
   </body>
 </html>

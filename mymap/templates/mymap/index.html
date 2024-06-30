@@ -5,7 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+   
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+
     <title>Schools Map</title>
     <style>
        html, body {
@@ -28,7 +34,7 @@
       }).addTo(map);
 
       // Define custom icons with appropriate sizes
-      var redIcon = L.icon({
+      var redIcon2 = L.icon({
         iconUrl: '{% static "images/marker-icon-red.png" %}',
         shadowUrl: '{% static "images/marker-shadow.png" %}',
         iconSize: [25, 41], // size of the icon
@@ -38,7 +44,7 @@
         popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
       });
 
-      var blueIcon = L.icon({
+      var blueIcon2 = L.icon({
         iconUrl: '{% static "images/marker-icon-blue.png" %}',
         shadowUrl: '{% static "images/marker-shadow.png" %}',
         iconSize: [25, 41], // size of the icon
@@ -48,9 +54,42 @@
         popupAnchor: [1, -34] // point from which the popup should open relative to the iconAnchor
       });
 
+        // Creates a blue marker with the coffee icon
+        var blueIcon = L.AwesomeMarkers.icon({
+          prefix: 'fa',
+          icon: 'building',
+          markerColor: 'blue'
+        });
+      
+        // Creates a red marker with the coffee icon
+        var redIcon = L.AwesomeMarkers.icon({
+          prefix: 'fa',
+          icon: 'book',
+          markerColor: 'red'
+        });
+     
       var marker, circle;
+      var nursery = L.layerGroup();
+      var primary = L.layerGroup();
+
+      var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      });
+
+      var baseLayers = {
+        "OSM": osm,
+      };
+      var overlays = {
+        // add to control
+        "Nusery": nursery,
+        "Primary": primary,
+      };
+      L.control.layers(baseLayers, overlays).addTo(map);
+
 
       map.on('click', function(e) {
+        // Remove the marker and circle if it exists
         if (marker) {
           map.removeLayer(marker);
           map.removeLayer(circle);
@@ -65,9 +104,19 @@
         }).addTo(map);
 
         fetchNearbySchools(e.latlng.lat, e.latlng.lng);
+
+        // add to map
+        map.addLayer(nursery);
+        map.addLayer(primary);
+
+        map.fitBounds(circle.getBounds());
+
+
       });
 
+ 
       function fetchNearbySchools(lat, lon) {
+
         fetch(`/get_nearby_schools/${lat}/${lon}/`)
           .then(response => response.json())
           .then(data => {
@@ -79,21 +128,14 @@
             });
 
             data.forEach(point => {
-              var icon = point.stage_number == 1 ? redIcon : blueIcon;
-
-              L.marker([point.lat, point.lon], { icon: icon })
-                .addTo(map)
-                .bindPopup("<b>" + point.name + "</b><br>Latitude: " + point.lat + "<br>Longitude: " + point.lon);
+              if (point.stage_number == 1) {
+                nursery.addLayer(L.marker([point.lat, point.lon], { icon: redIcon }).bindPopup("<b>" + point.name + "</b><br>Latitude: " + point.lat + "<br>Longitude: " + point.lon));
+              } else {
+                primary.addLayer(L.marker([point.lat, point.lon], { icon: blueIcon }).bindPopup("<b>" + point.name + "</b><br>Latitude: " + point.lat + "<br>Longitude: " + point.lon));
+              }
             });
-
-            var group = new L.featureGroup([marker, circle]);
-            data.forEach(point => {
-              var schoolMarker = L.marker([point.lat, point.lon]);
-              group.addLayer(schoolMarker);
-            });
-            map.fitBounds(group.getBounds());
           });
-      }
+        }
     </script>
   </body>
 </html>

@@ -98,7 +98,7 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
-
+ 
 # Update default database with DATABASE_URL if available
 DATABASES["default"].update(dj_database_url.config(conn_max_age=600, ssl_require=True))
 

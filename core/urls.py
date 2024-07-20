@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from mymap.views import index, school_map, get_nearby_schools
+from mymap.views import index, school_map, get_nearby_schools, upload_csv
 
 urlpatterns = [
     path('', index, name='mymap-index'),
     path('admin/', admin.site.urls),
     path('map/', school_map, name='school_map'),
     path('get_nearby_schools/<lat>/<lon>/', get_nearby_schools, name='get_nearby_schools'),
+    path('upload_csv/', upload_csv, name='upload_csv'),
 ]

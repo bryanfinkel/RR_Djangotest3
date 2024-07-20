@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from mymap.models import MapPoint, Schools
 from mymap.forms import CSVUploadForm   # Import the form class
 import pandas as pd
@@ -24,6 +24,22 @@ def index(request):
         form = CSVUploadForm()
         return render(request, "mymap/index.html", {'allpoints':allpoints, 'form':form}) 
     
+    # Create your upload_csv here.
+def upload_csv(request):
+    # allpoints = MapPoint.objects.all()    
+
+    if request.method == 'POST':
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['file_content'])
+            return redirect('/')
+        else:
+            return render(request, "mymap/index_form.html", {'form':form})
+    else:
+        form = CSVUploadForm()
+        return render(request, "mymap/index_form.html", {'form':form}) 
+    
+
 def handle_uploaded_file(f):
     df = pd.read_csv(f)
     df['# Classrooms'] = df['# Classrooms'].fillna(0)

@@ -99,8 +99,6 @@ DATABASES = {
     }
 }
  
-# Update default database with DATABASE_URL if available
-DATABASES["default"].update(dj_database_url.config(conn_max_age=600, ssl_require=True))
 
 
 # DATABASES = {  # THIS SECTION WAS WORKING WITH OUR OWN DATABASE

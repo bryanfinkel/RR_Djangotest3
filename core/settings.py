@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-t6*$kze)ysz6b(7d1t_shv)^_mw049#8j1*a2mr+qhaf**8biu
 # ALLOWED_HOSTS = ["*"]
 
 DEBUG = False
-ALLOWED_HOSTS = ['your-railway-app-domain', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['rrdjangotest3-production.up.railway.app', 'localhost', '127.0.0.1']
 
 
 # CSRF_TRUSTED_ORIGINS = ["*"]

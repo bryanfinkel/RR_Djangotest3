@@ -32,7 +32,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['rrdjangotest3-production.up.railway.app', 'localhost', '127.0.0.1']
 
 
-# CSRF_TRUSTED_ORIGINS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["https://rrdjangotest3-production.up.railway.app/"]
 
 # Application definition
 

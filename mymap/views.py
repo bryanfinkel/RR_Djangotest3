@@ -42,7 +42,7 @@ def upload_csv(request):
     
 
 def handle_uploaded_file(f):
-    chunksize = 10000  # Adjust the chunk size according to your memory capacity
+    chunksize = 4000  # Adjust the chunk size according to your memory capacity
     for chunk in pd.read_csv(f, chunksize=chunksize):
         chunk['# Classrooms'] = chunk['# Classrooms'].fillna(0)
 

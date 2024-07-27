@@ -41,23 +41,44 @@ def upload_csv(request):
     
 
 def handle_uploaded_file(f):
-    df = pd.read_csv(f)
-    df['# Classrooms'] = df['# Classrooms'].fillna(0)
-    # loop thru rows
-    for index, row in df.iterrows():
-        try:
-            school, created=Schools.objects.get_or_create(
-                name=row['Name'], 
-                lat=row['Latitude'], 
-                lon=row['Longitude'], 
-                Level=row['Level'], 
-                Status=row['Status'], 
-                Sponsor=row['Sponsor'], 
-                Classrooms=row['# Classrooms'])
-        except Exception as e:
-            continue
+    chunksize = 1000  # Adjust the chunk size according to your memory capacity
+    for chunk in pd.read_csv(f, chunksize=chunksize):
+        chunk['# Classrooms'] = chunk['# Classrooms'].fillna(0)
 
-    print(df.head())
+        with transaction.atomic():
+            for index, row in chunk.iterrows():
+                try:
+                    Schools.objects.get_or_create(
+                        name=row['Name'], 
+                        lat=row['Latitude'], 
+                        lon=row['Longitude'], 
+                        Level=row['Level'], 
+                        Status=row['Status'], 
+                        Sponsor=row['Sponsor'], 
+                        Classrooms=row['# Classrooms']
+                    )
+                except Exception as e:
+                    print(f"Error processing row {index}: {e}")
+                    continue
+
+        print(chunk.head())
+    # df = pd.read_csv(f)
+    # df['# Classrooms'] = df['# Classrooms'].fillna(0)
+    # # loop thru rows
+    # for index, row in df.iterrows():
+    #     try:
+    #         school, created=Schools.objects.get_or_create(
+    #             name=row['Name'], 
+    #             lat=row['Latitude'], 
+    #             lon=row['Longitude'], 
+    #             Level=row['Level'], 
+    #             Status=row['Status'], 
+    #             Sponsor=row['Sponsor'], 
+    #             Classrooms=row['# Classrooms'])
+    #     except Exception as e:
+    #         continue
+
+    # print(df.head())
 
 # New view function for the school map (this was the simple version, but too may points included)
 # def school_map(request):

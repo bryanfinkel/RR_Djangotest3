@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.db import transaction
 from mymap.models import MapPoint, Schools
 from mymap.forms import CSVUploadForm   # Import the form class
 import pandas as pd

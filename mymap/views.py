@@ -59,10 +59,7 @@ def handle_uploaded_file(f):
                         Classrooms=row['# Classrooms']
                     )
                 except Exception as e:
-                    print(f"Error processing row {index}: {e}")
                     continue
-
-        print(chunk.head())
     # df = pd.read_csv(f)
     # df['# Classrooms'] = df['# Classrooms'].fillna(0)
     # # loop thru rows

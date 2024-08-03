@@ -28,11 +28,17 @@ SECRET_KEY = 'django-insecure-t6*$kze)ysz6b(7d1t_shv)^_mw049#8j1*a2mr+qhaf**8biu
 # DEBUG = True
 # ALLOWED_HOSTS = ["*"]
 
-DEBUG = False
-ALLOWED_HOSTS = ['rrdjangotest3-production.up.railway.app', 'localhost', '127.0.0.1']
+DEBUG = False # set to False for production
+ALLOWED_HOSTS = [
+    'rrdjangotest3-production-4db0.up.railway.app',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0'
+    ]
+# prior: rrdjangotest3-production.up.railway.app
 
-
-CSRF_TRUSTED_ORIGINS = ["https://rrdjangotest3-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ['https://rrdjangotest3-production-4db0.up.railway.app']
+# CSRF_TRUSTED_ORIGINS = ["https://rrdjangotest3-production.up.railway.app"]
 
 # Application definition
 
@@ -176,3 +182,11 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000000   # 10000 is the default value
 
 # CHUNKSIZE = 1000  NB: see the django documentation for more info on this, and see views.py for more info on how this is used.
 # testing
+
+#suggestions from ChatGPT:
+# Security settings
+SECURE_HSTS_SECONDS = 31536000
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

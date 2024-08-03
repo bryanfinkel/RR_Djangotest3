@@ -42,7 +42,7 @@ def upload_csv(request):
     
 
 def handle_uploaded_file(f):
-    chunksize = 4000  # Adjust the chunk size according to your memory capacity
+    chunksize = 1000  # Adjust the chunk size according to your memory capacity
     for chunk in pd.read_csv(f, chunksize=chunksize):
         chunk['# Classrooms'] = chunk['# Classrooms'].fillna(0)
 
@@ -56,7 +56,11 @@ def handle_uploaded_file(f):
                         Level=row['Level'], 
                         Status=row['Status'], 
                         Sponsor=row['Sponsor'], 
-                        Classrooms=row['# Classrooms']
+                        Classrooms=row['# Classrooms'],
+                        # Stage= models.CharField(max_length=250, blank=True, null=True) # replaced by the following two fields
+                        stage_number = row['Stage Number'],
+                        stage_name = row['Stage Name']
+
                     )
                 except Exception as e:
                     continue

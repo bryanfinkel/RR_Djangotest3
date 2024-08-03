@@ -172,5 +172,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10621440
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000000   # 10000 is the default value
+# chunksize is the number of records to be inserted at a time.
 
+# CHUNKSIZE = 1000  NB: see the django documentation for more info on this, and see views.py for more info on how this is used.
 # testing

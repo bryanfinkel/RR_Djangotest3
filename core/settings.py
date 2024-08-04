@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-t6*$kze)ysz6b(7d1t_shv)^_mw049#8j1*a2mr+qhaf**8biu
 # DEBUG = True
 # ALLOWED_HOSTS = ["*"]
 
-DEBUG = False # set to False for production
+DEBUG = True # set to False for production
 ALLOWED_HOSTS = [
     'bryanrr.up.railway.app',
     'rrdjangotest3-production-4db0.up.railway.app',
@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
     ]
 # prior: rrdjangotest3-production.up.railway.app
 
-CSRF_TRUSTED_ORIGINS = ['https://rrdjangotest3-production-4db0.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://bryanrr.up.railway.app', 'https://rrdjangotest3-production-4db0.up.railway.app']
 # CSRF_TRUSTED_ORIGINS = ["https://rrdjangotest3-production.up.railway.app"]
 
 # Application definition
